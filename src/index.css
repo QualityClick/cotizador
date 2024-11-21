@@ -1,0 +1,40 @@
+@font-face {
+  font-family: 'GalanoGrotesqueRegular', sans-serif;
+  src: local('GalanoGrotesqueRegular'),
+    url('./assets/fonts/GalanoGrotesqueRegular.otf') format('opentype');
+  font-weight: normal;
+}
+
+/* makes sizing simpler  */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* remove default spacing */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* dark mode user-agent-styles */
+/* html {
+  color-scheme: dark light;
+} */
+
+/* min body height */
+body {
+  min-height: 100svh;
+  font-family: 'GalanoGrotesqueRegular', sans-serif;
+}
+
+/* responsive images/videos */
+/* img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+} */

@@ -1,0 +1,330 @@
+.pdf {
+  padding: 0px 50px 0px 50px;
+  width: 1000px;
+  margin: 0 auto;
+}
+
+.pdf__header {
+  display: flex;
+  justify-content: space-between;
+  padding-block: 45px 10px;
+  .pdf__header__img__datos {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    .pdf__header__img {
+      // height: 125 1px;
+      // width: 250px;
+      width: 625px;
+      margin-top: 17.5px;
+      margin-left: -35px;
+    }
+    .pdf__header__cliente__datos {
+      display: flex;
+      flex-direction: column;
+      gap: 0px;
+      span {
+        font-weight: 900;
+      }
+    }
+    .pdf__header__vendedor__datos {
+      display: flex;
+      flex-direction: column;
+      gap: 0px;
+    }
+  }
+  .pdf__header__title {
+    margin-top: 15px;
+    .pdf__header__datos {
+      width: 310px;
+      font-size: 1rem;
+      :first-child {
+        font-size: 1rem;
+        // font-weight: 900;
+      }
+      :nth-child(2) {
+        font-size: 1rem;
+        margin-bottom: 8px;
+      }
+    }
+    > * {
+      margin-top: -10px;
+      text-align: end;
+    }
+    padding-top: 25px;
+    max-width: 350px;
+    position: relative;
+    :first-child {
+      margin-top: 10px;
+      font-size: 1rem;
+      // font-weight: 900;
+    }
+    .pdf__header__datos1 {
+      font-weight: 900;
+    }
+    :nth-child(2) {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    :nth-child(3) {
+      font-size: 1rem;
+      margin-top: 0px;
+    }
+    :nth-child(4) {
+      font-size: 1rem;
+      margin-top: 0px;
+      span {
+        font-weight: 700;
+      }
+      .pdf__header__title-vendor {
+        font-weight: 400;
+        margin-top: -10px;
+      }
+    }
+    :nth-child(5) {
+      margin-top: 40px;
+      img {
+        height: 40px;
+        // aspect-ratio: 3/1.5;
+        // object-fit: cover;
+        // margin-left: 87px;
+        display: block;
+        margin-bottom: -10px;
+        position: absolute;
+        top: 155px;
+        left: -10px;
+      }
+      span {
+        a {
+          font-size: 1.5rem;
+          color: #000;
+          text-decoration: none;
+          position: absolute;
+          top: 190px;
+          left: 5px;
+        }
+      }
+    }
+  }
+}
+
+.cliente {
+  padding-bottom: 20px;
+  .cliente__title__bar {
+    background-color: #fac000;
+    padding-block: 15px;
+    font-size: 1rem;
+    font-weight: 700;
+    padding-left: 30px;
+    // line-height: 0.5 !important;
+
+    // text-align: center;
+  }
+  .cliente__datos {
+    display: flex;
+    justify-content: space-between;
+  }
+  .cliente__datos__pair:nth-child(2) {
+    :first-child {
+      text-align: end;
+    }
+  }
+}
+
+.cotizacion {
+  .cotizacion__title__bar {
+    width: 100%;
+    .cotizacion__title__thead {
+      background-color: #fac000;
+      .cotizacion__title__tr-concepto {
+        border: 1px solid rgba(0, 0, 0, 0.411);
+      }
+      .cotizacion__title__th {
+        padding-block: 15px;
+        text-align: center;
+        width: 100px;
+      }
+      .cotizacion__title__th-concepto {
+        font-size: 1.1rem;
+        padding-block: 0px;
+        padding-left: 15px;
+        padding-top: 5px;
+      }
+    }
+    .cotizacion__title__tbody {
+      .cotizacion__title__tr {
+        .cotizacion__title__td {
+          padding-block: 15px;
+          text-align: center;
+          width: 100px;
+          border: 4px solid rgb(0, 0, 0);
+        }
+      }
+    }
+  }
+  .cotizacion__observaciones {
+    // font-weight: 900;
+    width: 100%;
+    padding-top: 20px;
+    padding-left: 20px;
+    margin-top: 15px;
+    padding-bottom: 20px;
+    border: 4px solid rgb(0, 0, 0);
+    h5 {
+      font-weight: 900;
+      margin-bottom: -20px;
+    }
+  }
+}
+
+.total {
+  margin-top: 30px;
+  font-size: 1.2rem;
+  // width: 350px;
+  // margin-left: auto;
+  display: flex;
+  // flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  .cotizacion__total__div {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    font-weight: 900;
+    font-size: 1rem;
+    // .cotizacion__total__span {
+    // }
+  }
+  .certificaciones__img {
+    width: 250px;
+    margin-right: -25px;
+    margin-top: 15px;
+  }
+}
+
+.banco {
+  margin-top: 50px;
+  .banco__title__bar {
+    background-color: #000;
+    color: #fff;
+    padding-block: 15px;
+    font-size: 1rem;
+    font-weight: 700;
+    padding-left: 30px;
+  }
+  .banco__datos__img {
+    display: flex;
+    justify-content: space-between;
+    :first-child {
+      margin-top: 30px;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    img {
+      height: 410px;
+    }
+  }
+}
+.banco__datos__text {
+  span {
+    font-weight: 700;
+  }
+}
+
+.observaciones__text {
+  margin-top: -35px;
+  margin-bottom: 120px;
+  h5 {
+    font-size: 1.2rem;
+    font-weight: 900;
+  }
+  .observaciones__ul {
+    margin-left: -15px;
+    font-size: 0.75rem;
+  }
+  p {
+    font-size: 0.8rem;
+    font-weight: 900;
+  }
+}
+
+.footer {
+  margin-top: 0px;
+  width: 120%;
+  background-color: #fbc512;
+  margin-left: -90px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .footer__social {
+    display: flex;
+    color: #fff;
+    padding-block: 30px;
+    font-weight: 700;
+    padding-left: 73px;
+    gap: 5px;
+    a {
+      width: 40px;
+      background-color: #000;
+      color: #fff;
+      font-size: 1.4rem;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &:hover {
+        background-color: #fff;
+        color: #000;
+        transition: 0.3s all;
+      }
+    }
+  }
+  .footer__web {
+    img {
+      width: 350px;
+      margin-right: 30px;
+    }
+  }
+}
+
+.pdf__button__container {
+  position: absolute;
+  top: 10px;
+  right: 50px;
+  .pdf__button {
+    background-color: #fbc512;
+    font-size: 1rem;
+    font-weight: 800;
+    border: none;
+    border-radius: 30px;
+    height: 40px;
+    width: 150px;
+    margin-left: 10px;
+
+    &:hover {
+      background-color: #2c2c2c;
+      color: #fff;
+      transition: 0.3s all;
+    }
+    &:active {
+      transform: scale(0.99);
+    }
+  }
+}
+
+.pdf__loader__spinner {
+  position: fixed;
+  z-index: 999;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 50px;
+  height: 50px;
+  .pdf__loader__text {
+    margin-left: -15px;
+  }
+}

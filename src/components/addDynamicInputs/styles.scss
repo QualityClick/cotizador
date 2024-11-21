@@ -1,0 +1,99 @@
+.cotizador__container--add-dynamic-inputs {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.dynamic__input--ul {
+  width: 100%;
+}
+
+.dynamic__input--li {
+  width: 95%;
+  list-style: none;
+}
+
+.conditional-border {
+  border-top: 3px solid #ffffff8d;
+  // border-radius: 30px;
+  margin-block: 10px;
+  padding: 10px;
+}
+
+.input_container {
+  position: relative !important;
+}
+.cotizador__inputs--select,
+.cantidad,
+.precio {
+  width: 100%;
+}
+
+.cotizador__form--borrar-button {
+  cursor: pointer;
+  position: absolute;
+  top: 15px;
+  right: 10px;
+  padding: 0px 8px 2px 8px;
+  border-radius: 50%;
+  background-color: #cc1a1a;
+  color: #000;
+  font-weight: 900;
+  border: none;
+}
+.cotizador__form--agregar-button-container {
+  display: flex;
+  justify-content: end;
+  align-items: end;
+  .cotizador__form--agregar-button {
+    background-color: #000000;
+    color: #aaaaaa;
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 5px 30px;
+    border: none;
+    margin-top: 30px;
+    border-radius: 30px;
+    &:hover {
+      background-color: #aaa;
+      color: #000;
+      transition: 0.3s all;
+    }
+  }
+}
+.cotizador__form--guardar-button {
+  width: 95%;
+  margin: 0px 10px 0px 0px;
+  padding: 15px 5px;
+  background-color: #9f9f9f;
+  border-radius: 30px;
+  border: none;
+  font-size: 0.75rem;
+  color: #000;
+  z-index: 99;
+  &:hover {
+    background-color: #222222;
+    color: #fff;
+    transition: 0.3s all;
+  }
+}
+
+@media (max-width: 600px) {
+  .cotizador__container--add-dynamic-inputs {
+    width: 100%;
+  }
+  .input_container {
+    width: 100% !important;
+    // position: relative !important;
+  }
+  .cotizador__form--guardar-button {
+    width: 150px;
+    margin: 0px 35px 0px 0px;
+    // padding: 2px 5px;
+    // background-color: #1b5f3e;
+    // border-radius: 30px;
+    // border: none;
+    // font-size: 0.75rem;
+    // color: #fff;
+  }
+}

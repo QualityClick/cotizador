@@ -1,0 +1,108 @@
+.auth__navbar {
+  height: 110px;
+  background-color: #fbc512;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .auth__navbar--img {
+    height: 65px;
+  }
+}
+
+.auth__body {
+  background-color: #000;
+  color: #ffffff;
+  padding-block: 75px;
+  height: calc(100vh - 110px);
+
+  .auth__form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 400px;
+    margin: 0 auto;
+
+    .auth__form--inputs {
+      width: 100%;
+      // padding-inline: 1.5rem;
+    }
+
+    .auth__input--pair {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      // border: 1px solid red;
+    }
+    .auth__inputs--label {
+      margin: 20px 0px 15px 25px;
+      font-size: 1.25rem;
+    }
+
+    .auth__password--icon {
+      position: absolute;
+      top: 81px;
+      right: 25px;
+      color: #000;
+      cursor: pointer;
+    }
+
+    .auth__inputs--input {
+      background-color: #ffffff;
+      border: none;
+      border-radius: 30px;
+      height: 57px;
+      font-size: 1rem;
+      padding-inline: 1.5rem 3rem;
+    }
+
+    .auth__inputs--input:hover {
+      background-color: #cacaca;
+    }
+
+    .auth__form--error-message {
+      position: absolute;
+      top: 120px;
+      left: 30px;
+      font-size: 0.9rem;
+      color: #bd940dc7;
+      // margin: 5px 0 0 25px;
+    }
+    .auth__form--error-credentials {
+      // position: absolute;
+      // top: 365px;
+      // left: 45px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #bd940dc7;
+    }
+
+    .auth__form--button {
+      /* display: block; */
+      background-color: #fbc512;
+      font-size: 1rem;
+      font-weight: 800;
+      border: none;
+      margin-top: 53px;
+      border-radius: 30px;
+      height: 57px;
+      width: 100%;
+      /* padding-inline: 220px; */
+      &:hover {
+        background-color: #2c2c2c;
+        color: #fff;
+        transition: 0.3s all;
+      }
+      &:active {
+        transform: scale(0.99);
+      }
+    }
+    @media (max-width: 600px) {
+      .auth__form--inputs {
+        width: 90%;
+      }
+      .auth__form--button {
+        width: 90%;
+      }
+    }
+  }
+}
