@@ -4,6 +4,7 @@ import { auth } from '../../firebase/firebase-config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useGetUserInfo } from '../../hooks/useGetUserInfo';
+import Form from 'react-bootstrap/Form';
 import { Toaster, toast } from 'sonner';
 import { FaEye, FaEyeSlash, FaLock, FaEnvelope } from 'react-icons/fa6';
 import logoPrincipal from '../../assets/imgs/logoSolupatch.png';
@@ -15,7 +16,7 @@ export const Auth = () => {
   const { isAuth } = useGetUserInfo();
 
   const [passwordShown, setPasswordShown] = useState(false);
-  // const [credencialesEquivocadas, setCredencialesEquivocadas] = useState("");
+  const [isRecuerdame, setIsRecuerdame] = useState(false);
 
   const tooglePasswordShow = (e) => {
     e.preventDefault();
@@ -44,14 +45,17 @@ export const Auth = () => {
           userID: userCredential.user.uid,
           isAuth: true,
         };
-        // console.log("</> → authInfo.isAuth:", authInfo.isAuth);
-        // console.log(authInfo);
-        localStorage.setItem('auth', JSON.stringify(authInfo));
-        navigate('/cotizador');
+        if (!isRecuerdame) {
+          sessionStorage.setItem('auth', JSON.stringify(authInfo));
+          navigate('/cotizador');
+        } else {
+          localStorage.setItem('auth', JSON.stringify(authInfo));
+          navigate('/cotizador');
+        }
       })
       .catch((error) => {
-        console.log(error.code);
-        console.log(error.message);
+        // console.log(error.code);
+        // console.log(error.message);
         if (error.code === 'auth/invalid-credential') {
           // setCredencialesEquivocadas("Correo y/o contraseña equivocados");
           toast.warning('Correo y/o contraseña equivocados');
@@ -137,6 +141,26 @@ export const Auth = () => {
                   Este campo es requerido
                 </p>
               )}
+            </div>
+            <div className='auth__recuerdame-olvide'>
+              <div className='auth__recuerdame'>
+                <Form.Check id={`recuerdame`}>
+                  <Form.Check.Input
+                    className='auth__recuerdame-chekbox'
+                    isValid
+                    onChange={(e) => setIsRecuerdame(e.target.checked)}
+                  />
+                  <Form.Check.Label
+                    style={{ color: '#afafaf', fontSize: '0.8rem' }}
+                  >{`Recuerdame`}</Form.Check.Label>
+                </Form.Check>
+              </div>
+              <div
+                className='auth__olvide'
+                onClick={() => navigate('/olvide-contrasena')}
+              >
+                ¿Olvidaste la Contraseña?
+              </div>
             </div>
           </div>
           <button

@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 import { signOut } from 'firebase/auth';
 import { updateDoc, doc } from 'firebase/firestore';
@@ -18,9 +18,12 @@ import { toast } from 'sonner';
 import logoPrincipal from '../../assets/imgs/logoSolupatch.png';
 import { FaClipboardList, FaWhatsapp } from 'react-icons/fa6';
 import { RxAvatar } from 'react-icons/rx';
+import Overlay from 'react-bootstrap/Overlay';
+import Tooltip from 'react-bootstrap/Tooltip';
 
-import './styles.scss';
 import { AddDynamicInputs } from '../../components/addDynamicInputs';
+import './styles.scss';
+import { NavBar } from '../../components/navBar';
 
 export const UpdateCotizacion = () => {
   // const [tipo, setTipo] = useState("");
@@ -29,6 +32,8 @@ export const UpdateCotizacion = () => {
   const [dataFromDynamicInputs, setDataFromDynamicInputs] = useState('');
   const [conceptoGuardado, setConceptoGuardado] = useState(false);
   const [sumImportes, setSumImportes] = useState('');
+  const [show, setShow] = useState(false);
+  const target = useRef(null);
 
   const { addFolio } = useAddFolio();
   const { addCotizacion } = useAddCotizacion();
@@ -113,7 +118,7 @@ export const UpdateCotizacion = () => {
           toast.warning('Hubo un error en los datos, favor de verificar.');
         });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -121,9 +126,10 @@ export const UpdateCotizacion = () => {
     try {
       await signOut(auth);
       localStorage.clear();
+      sessionStorage.clear();
       navigate('/autenticacion');
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -147,7 +153,7 @@ export const UpdateCotizacion = () => {
   let cotizacionSeleccionada = cotizaciones.find(
     (cotizacion) => cotizacion?.id === cotizacionId
   );
-  console.log(cotizacionId);
+  // console.log(cotizacionId);
 
   useEffect(() => {
     setValue('nombre', cotizacionSeleccionada?.nombre);
@@ -163,101 +169,15 @@ export const UpdateCotizacion = () => {
     // setValue('dynamicForm', cotizacionSeleccionada?.dynamicForm);
   }, [cotizacionSeleccionada, setValue]);
 
-  console.log(conceptoGuardado);
+  // console.log(conceptoGuardado);
 
   return (
     <div className='cotizador'>
-      {/* {console.log(cotizacionSeleccionada?.dynamicForm)} */}
-      {/* <div className='cotizador__navbar'>
-        <div className='cotizador__navbar--vendedor'>
-          <span>Vendedor:</span> {emailValue}
-        </div>
-        <img
-          className='cotizador__navbar--img'
-          src={logoPrincipal}
-          alt='Solupatch Logo'
-        />
-        <div className='navbar__buttons'>
-          <a href='/cotizaciones'>
-            <button className='navbar__button--cotizador'>Cotizaciones</button>
-          </a>
-          <button className='navbar__button--cotizador' onClick={logout}>
-            Salir
-          </button>
-        </div>
-      </div> */}
-      <div className='cotizaciones__navbar'>
-        <a href='https://solupatch.com' target='_blank'>
-          <img
-            src={logoPrincipal}
-            alt='Logo Solupatch'
-            className='cotizaciones__navbar--img'
-          />
-        </a>
-        <div className='navbar__buttons'>
-          <a href='/cotizaciones'>
-            <button className='navbar__button--cotizaciones'>
-              <FaClipboardList
-                style={{
-                  fontSize: '1rem',
-                  marginTop: '-5px',
-                  marginRight: '-3px',
-                }}
-              />{' '}
-              Cotizaciones
-            </button>
-          </a>
-          <a href='https://wa.link/vmn1ao' target='_blank'>
-            <button className='navbar__button--cotizaciones'>
-              <FaWhatsapp /> Soporte
-            </button>
-          </a>
-          <div
-            onClick={logout}
-            className='navbar__button--cotizaciones-vendedor-container'
-          >
-            <button
-              className='navbar__button--cotizaciones-vendedor'
-              // onClick={logout}
-            >
-              <div style={{ display: 'flex' }}>
-                <div>
-                  <div style={{ fontWeight: '900' }}>
-                    {emailValue === 'rvl@solupatch.com'
-                      ? 'Rodolfo Villalobos'
-                      : emailValue === 'aclarrea@solupatch.com'
-                      ? 'Ana Larrea'
-                      : emailValue === 'jlramos@solupatch.com'
-                      ? 'José Ramos'
-                      : emailValue === 'lblanco@solupatch.com'
-                      ? 'Luis Blanco'
-                      : 'Invitado'}
-                  </div>
-                  <div style={{ fontWeight: '100' }}>{emailValue}</div>
-                </div>
-                <div>
-                  <RxAvatar
-                    style={{
-                      fontSize: '1.5rem',
-                      marginTop: '5px',
-                      marginLeft: '10px',
-                    }}
-                  />
-                </div>
-              </div>
-            </button>
-            <div className='navbar__button--cotizaciones-vendedor-overlay'>
-              <div className='navbar__button--cotizaciones-vendedor-text'>
-                Cerrar Sesión
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <NavBar />
       <div className='cotizador__body'>
         <div className='cotizador__hero'>
-          <h2 className='cotizador__header--title'>COTIZADOR</h2>
-          <p className='cotizador__header--paragraph'>Solupatch Versión 1.0</p>
+          <h2 className='cotizador__header--title'>EDITAR COTIZACIÓN</h2>
+          {/* <p className='cotizador__header--paragraph'>Solupatch Versión 1.0</p> */}
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className='cotizador__form'>
           <div className='cotizador__form--inputs'>
@@ -328,10 +248,6 @@ export const UpdateCotizacion = () => {
               )} */}
             </div>
           </div>
-          <AddDynamicInputs
-            getDataFromChild={handleDataFromChild}
-            stateChanger={setConceptoGuardado}
-          />
           <div className='cotizador__form--inputs2'>
             <div className='cotizador__input--pair'>
               <label className='cotizador__inputs--label'>
@@ -375,6 +291,11 @@ export const UpdateCotizacion = () => {
               )}
             </div>
           </div>
+          <AddDynamicInputs
+            getDataFromChild={handleDataFromChild}
+            stateChanger={setConceptoGuardado}
+          />
+
           <button
             disabled={!conceptoGuardado}
             type='submit'

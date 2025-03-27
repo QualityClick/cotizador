@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
-import logoPrincipal from '../../assets/imgs/LOGO-SOLUPATCH.png';
+import logoPrincipal from '../../assets/imgs/LOGO-BACHEREY.png';
 import certificacionesImg from '../../assets/imgs/CERTIFICACIONES.png';
 import { FaFacebookF, FaTiktok, FaInstagram } from 'react-icons/fa';
 import solupatchWeb from '../../assets/imgs/PAGINA WEB.png';
@@ -17,9 +17,9 @@ import { useGetCotizaciones } from '../../hooks/useGetCotizaciones';
 import moment from 'moment';
 
 import './styles.scss';
-import { PDFTr } from './PDFTr';
+import { PDFTrBacherey } from './PDFTr-bacherrey';
 
-export const PDF = () => {
+export const PDFBacherey = () => {
   // const navigate = useNavigate();
   const [datePdf, setDatePdf] = useState('');
 
@@ -290,6 +290,7 @@ export const PDF = () => {
             <section className='pdf__header'>
               <div className='pdf__header__img__datos'>
                 <img
+                  style={{ width: '500px' }}
                   className='pdf__header__img'
                   src={logoPrincipal}
                   alt='Solupatch Logo'
@@ -401,7 +402,7 @@ export const PDF = () => {
                     <th className='cotizacion__title__th'>TOTAL</th>
                   </tr>
                 </thead>
-                <PDFTr
+                <PDFTrBacherey
                   cotizaciones={cotizaciones}
                   cotizacionSeleccionada={cotizacionSeleccionada}
                   fromPdfChild={fromPdfChild}
@@ -489,33 +490,34 @@ export const PDF = () => {
                 <div className='cotizacion__total__div'>
                   <span className='cotizacion__total__span'>
                     SUBTOTAL:{'  '}
-                  </span>{' '}
                   $
                   {cotizacionSeleccionada.dynamicForm
                     ? importeDyFormated
                     : importeFormated}
+                    </span>
                 </div>
                 <div className='cotizacion__total__div'>
                   <span className='cotizacion__total__span'>
                     ENTREGA: {'  '}
-                  </span>
                   ${entregaFormated}
+                  </span>
                 </div>
                 <div className='cotizacion__total__div'>
                   <span className='cotizacion__total__span'>
                     IVA 16%: {'  '}
-                  </span>
                   $
                   {cotizacionSeleccionada.dynamicForm
                     ? ivaDyFormated
                     : ivaFormated}
+                    </span>
                 </div>
                 <div className='cotizacion__total__div'>
-                  <span className='cotizacion__total__span'>TOTAL:{'  '} </span>
+                  <span className='cotizacion__total__span'>TOTAL:{'  '} 
                   $
                   {cotizacionSeleccionada.dynamicForm
                     ? totalDyFormated
                     : totalFormated}
+                    </span>
                 </div>
                 <img
                   className='certificaciones__img'
@@ -568,6 +570,15 @@ export const PDF = () => {
             </section>
 
             <section className='footer'>
+              <div className='footer__web'>
+                <a
+                  href='https://www.bacherey.com'
+                  target='_blank'
+                  rel='noreferrer'
+                >
+                  BACHEREY.COM
+                </a>
+              </div>
               <div className='footer__social'>
                 <a
                   href='https://www.facebook.com/solupatch'
@@ -582,22 +593,6 @@ export const PDF = () => {
                   rel='noreferrer'
                 >
                   <FaInstagram />
-                </a>
-                <a
-                  href='https://www.instagram.com/solupatch'
-                  target='_blank'
-                  rel='noreferrer'
-                >
-                  <FaTiktok />
-                </a>
-              </div>
-              <div className='footer__web'>
-                <a
-                  href='https://www.solupatch.com'
-                  target='_blank'
-                  rel='noreferrer'
-                >
-                  <img src={solupatchWeb} alt='Solupatch Web' />
                 </a>
               </div>
             </section>

@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  // useEffect,
-  useRef,
-  useState,
-  useMemo,
-} from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 
 import { signOut } from 'firebase/auth';
 import { deleteDoc, doc, updateDoc } from 'firebase/firestore';
@@ -45,6 +39,9 @@ import { RxAvatar } from 'react-icons/rx';
 import '../cotizaciones/styles.scss';
 import { MdSave } from 'react-icons/md';
 import ClipLoader from 'react-spinners/ClipLoader';
+import Overlay from 'react-bootstrap/Overlay';
+import Tooltip from 'react-bootstrap/Tooltip';
+import { NavBar } from '../../components/navBar';
 
 export const Cotizaciones = () => {
   const [tempDeleteId, setTempDeleteId] = useState('');
@@ -54,9 +51,11 @@ export const Cotizaciones = () => {
   const [cotizacionesFiltered, setCotizacionesFiltered] = useState([]);
   const [sorting, setSorting] = useState([]);
   const [filtering, setFiltering] = useState('');
-  const [show, setShow] = useState(false);
   const [selectedDate, setSelectedDate] = useState('999999');
   const [finalDate, setFinalDate] = useState([]);
+  const [show, setShow] = useState(false);
+
+  const target = useRef(null);
 
   const {
     isAuth,
@@ -68,12 +67,6 @@ export const Cotizaciones = () => {
 
   const { cotizaciones } = useGetCotizaciones();
 
-  if (cotizaciones.length === 0) {
-    // console.log('No hay cotizaciones');
-  } else {
-    // console.log('Si hay cotizaciones');
-  }
-
   // NOTE: Excel sheet
   const downloadExcel = () => {
     let table = [
@@ -82,11 +75,11 @@ export const Cotizaciones = () => {
         B: 'CLIENTE',
         C: 'FECHA',
         D: 'VENDEDOR',
-        E: 'MERCANCÍA',
-        F: 'CANTIDAD',
-        G: 'EMPRESA',
-        H: 'EMAIL',
-        I: 'CELULAR',
+        E: 'EMPRESA',
+        F: 'EMAIL',
+        G: 'CELULAR',
+        H: 'MERCANCÍA',
+        I: 'CANTIDAD',
         J: 'TOTAL',
       },
     ];
@@ -101,28 +94,80 @@ export const Cotizaciones = () => {
         return Fordate;
       };
 
+      const newArrSeleccione = [];
+      if (cotizacion.dynamicForm) {
+        newArrSeleccione.push(
+          cotizacion.dynamicForm.map((item) => item.seleccione)
+        );
+      }
+      const newArrCantidad = [];
+      if (cotizacion.dynamicForm) {
+        newArrCantidad.push(
+          cotizacion.dynamicForm.map((item) => item.cantidad)
+        );
+      }
+
+      const {
+        nombre,
+        id,
+        emailValue,
+        entrega,
+        folio,
+        status,
+        cantidad,
+        precio,
+        total,
+        // seleccione,
+        // empresa,
+        // celular,
+        // email,
+      } = cotizacion;
+      let importe = cantidad * 1 * (precio.replace(/,/g, '') * 1);
+      let iva = (importe + entrega.replace(/,/g, '') * 1) * 0.16;
+      let totalImporte = importe + iva + entrega.replace(/,/g, '') * 1;
+      let totalFormated = totalImporte.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+      let importeDy = total;
+      let ivaDy = (importeDy + entrega.replace(/,/g, '') * 1) * 0.16;
+      let totalImporteDy = importeDy + ivaDy + entrega.replace(/,/g, '') * 1;
+      let totalFormatedDy = totalImporteDy.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
       table.push({
         A: cotizacion.folio,
         B: cotizacion.nombre,
         C: formatedDate(),
-        D: cotizacion.emailValue,
-        E: cotizacion.seleccione,
-        F: cotizacion.cantidad,
-        G: cotizacion.empresa,
-        H: cotizacion.email,
-        I: cotizacion.celular,
-        J: (
-          (((cotizacion.cantidad / 1) * cotizacion.precio.replace(/,/g, '')) /
-            1 +
-            cotizacion.entrega.replace(/,/g, '') / 1) *
-            0.16 +
-          (((cotizacion.cantidad / 1) * cotizacion.precio.replace(/,/g, '')) /
-            1 +
-            cotizacion.entrega.replace(/,/g, '') / 1)
-        ).toLocaleString('en-US', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }),
+        D:
+          cotizacion.emailValue === 'rvl@solupatch.com'
+            ? 'Rodolfo Villalobos'
+            : emailValue === 'aclarrea@solupatch.com'
+            ? 'Ana Larrea'
+            : emailValue === 'jlramos@solupatch.com'
+            ? 'José Ramos'
+            : emailValue === 'lblanco@solupatch.com'
+            ? 'Luis Blanco'
+            : 'Invitado',
+        E: cotizacion.empresa,
+        F: cotizacion.email,
+        G: cotizacion.celular,
+        H: cotizacion.dynamicForm
+          ? newArrSeleccione
+              .map((item) => item)
+              .toString()
+              .replace(/,/g, '\n')
+          : cotizacion.seleccione,
+        I: cotizacion.dynamicForm
+          ? newArrCantidad
+              .map((item) => item)
+              .toString()
+              .replace(/,/g, '\n')
+          : cotizacion.cantidad,
+        J: cotizacion.dynamicForm ? totalFormatedDy : totalFormated,
       });
     });
 
@@ -130,6 +175,7 @@ export const Cotizaciones = () => {
 
     createFilter(finalData);
   };
+
   const createFilter = (finalData) => {
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(finalData, { skipHeader: true });
@@ -141,16 +187,17 @@ export const Cotizaciones = () => {
     try {
       await signOut(auth);
       localStorage.clear();
+      sessionStorage.clear();
       navigate('/autenticacion');
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
   const modalRef = useRef(null);
 
   const closeModal = () => {
-    console.log(tempDeleteId);
+    // console.log(tempDeleteId);
     modalRef.current.close();
   };
 
@@ -186,13 +233,13 @@ export const Cotizaciones = () => {
 
   const onClickUpdate = (id) => {
     setTempUpdateId(id);
-    console.log('</> → id:', id);
+    // console.log('</> → id:', id);
   };
 
   const onUpdate = async (e, statusFromDropdown) => {
     setShowSaveBtn(true);
     setNuevoStatus(statusFromDropdown);
-    console.log(statusFromDropdown);
+    // console.log(statusFromDropdown);
     // try {
     //   // console.log(tempUpdateId);
     //   const docRef = doc(db, 'cotizaciones', tempUpdateId);
@@ -215,7 +262,7 @@ export const Cotizaciones = () => {
         status: nuevoStatus,
       });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
     toast.success('Estado actualizado');
     setShowSaveBtn(false);
@@ -415,8 +462,22 @@ export const Cotizaciones = () => {
       header: 'PDF',
       accessorKey: '',
       cell: (info) => {
+        // console.log(
+        //   info.row.original.dynamicForm.some(
+        //     (obj) => obj.seleccione === '25kg Solupatch Bultos'
+        //   )
+        // );
         return (
-          <NavLink to={`/pdf/${info.row.original?.id}`} target='_blank'>
+          <NavLink
+            to={
+              info.row.original.dynamicForm.some(
+                (obj) => obj.seleccione === 'Bacherey'
+              )
+                ? `/pdf-bacherey/${info.row.original?.id}`
+                : `/pdf/${info.row.original?.id}`
+            }
+            target='_blank'
+          >
             <button className='cotizador__button--descargar'>
               {/* <FaFilePdf /> */}
               <p>PDF</p>
@@ -468,30 +529,6 @@ export const Cotizaciones = () => {
   }, [cotizaciones, emailValue]);
   // console.log(cotizacionesFiltered);
 
-  //  FIXME:: Soluciones filtro días
-
-  // ----------------------------
-
-  // const startDate = new Date(
-  //   `${new Date().getFullYear()}/${new Date().getMonth() + 1}/${
-  //     new Date().getUTCDate() + 1
-  //   }`
-  // );
-
-  // const date = new Date();
-  // date.setDate(date.getDate() - selectedDate);
-
-  // const endDate = new Date(
-  //   `${date.getFullYear()}/${date.getMonth() + 1}/${date.getUTCDate()}`
-  // );
-
-  // const filteredData = cotizacionesFiltered.filter((item) => {
-  //   const date = new Date(item?.createdAt?.seconds * 1000);
-  //   return date <= startDate && date >= endDate;
-  // });
-
-  // -------------------------
-
   const startDate = useMemo(
     () =>
       new Date(
@@ -519,8 +556,8 @@ export const Cotizaciones = () => {
     [cotizacionesFiltered, startDate, endDate]
   );
 
-  console.log(dateFilteredData);
-  console.log(cotizacionesFiltered);
+  // console.log(dateFilteredData);
+  // console.log(cotizacionesFiltered);
 
   const table = useReactTable({
     data: dateFilteredData.reverse(),
@@ -573,71 +610,7 @@ export const Cotizaciones = () => {
             </div>
           </div>
         </dialog>
-        <div className='cotizaciones__navbar'>
-          <a href='https://solupatch.com' target='_blank'>
-            <img
-              src={logoPrincipal}
-              alt='Logo Solupatch'
-              className='cotizaciones__navbar--img'
-            />
-          </a>
-          <div className='navbar__buttons'>
-            <a href='/cotizador'>
-              <button className='navbar__button--cotizaciones'>
-                <FaClipboardList
-                  style={{
-                    fontSize: '1rem',
-                    marginTop: '-5px',
-                    marginRight: '-3px',
-                  }}
-                />{' '}
-                COTIZADOR
-              </button>
-            </a>
-            <a href='https://wa.link/vmn1ao' target='_blank'>
-              <button className='navbar__button--cotizaciones'>
-                <FaWhatsapp /> SOPORTE
-              </button>
-            </a>
-            <div
-              onClick={logout}
-              className='navbar__button--cotizaciones-vendedor-container'
-            >
-              <button className='navbar__button--cotizaciones-vendedor'>
-                <div style={{ display: 'flex' }}>
-                  <div>
-                    <div style={{ fontWeight: '900' }}>
-                      {emailValue === 'rvl@solupatch.com'
-                        ? 'Rodolfo Villalobos'
-                        : emailValue === 'aclarrea@solupatch.com'
-                        ? 'Ana Larrea'
-                        : emailValue === 'jlramos@solupatch.com'
-                        ? 'José Ramos'
-                        : emailValue === 'lblanco@solupatch.com'
-                        ? 'Luis Blanco'
-                        : 'Invitado'}
-                    </div>
-                    <div style={{ fontWeight: '100' }}>{emailValue}</div>
-                  </div>
-                  <div>
-                    <RxAvatar
-                      style={{
-                        fontSize: '1.5rem',
-                        marginTop: '5px',
-                        marginLeft: '10px',
-                      }}
-                    />
-                  </div>
-                </div>
-              </button>
-              {/* <div className='navbar__button--cotizaciones-vendedor-overlay'>
-                <div className='navbar__button--cotizaciones-vendedor-text'>
-                  Cerrar Sesión
-                </div>
-              </div> */}
-            </div>
-          </div>
-        </div>
+        <NavBar />
         <div className='cotizaciones__body'>
           {cotizacionesFiltered.length > 0 ? (
             <>
@@ -648,12 +621,12 @@ export const Cotizaciones = () => {
                   width: '90%',
                 }}
               >
-                <button
+                {/* <button
                   className='navbar__button--cotizaciones-excel'
                   onClick={downloadExcel}
                 >
-                  <LuDownload /> Descargar Excel
-                </button>
+                  <LuDownload /> DESCARGAR EXCEL
+                </button> */}
               </div>
               <div
                 className='cotizaciones__header'
@@ -663,7 +636,13 @@ export const Cotizaciones = () => {
                 //   width: '100%',
                 // }}
               >
-                <h5 style={{ textAlign: 'center', paddingTop: '8px' }}>
+                <h5
+                  style={{
+                    textAlign: 'center',
+                    paddingTop: '8px',
+                    fontFamily: 'GalanoGrotesqueBold',
+                  }}
+                >
                   COTIZACIONES GENERADAS
                 </h5>
                 <div className='cotizaciones__filter-container'>
@@ -707,6 +686,12 @@ export const Cotizaciones = () => {
                       <option value='30'>Últimos 30 Días</option>
                     </select>
                   </div>
+                  <button
+                    className='navbar__button--cotizaciones-excel'
+                    onClick={downloadExcel}
+                  >
+                    <LuDownload /> DESCARGAR EXCEL
+                  </button>
                 </div>
               </div>
               <div className='cotizaciones__table-container'>
@@ -749,32 +734,33 @@ export const Cotizaciones = () => {
                   </tbody>
                 </table>
               </div>
-              <div
-                className='cotizaciones__paginationButtons'
-                style={{ textAlign: 'center', marginTop: '2rem' }}
-              >
-                <button onClick={() => table.setPageIndex(0)}>&lt;&lt;</button>
-                <button onClick={() => table.previousPage()}>&lt;</button>
-                <span>
-                  {'  '} {table.getState().pagination.pageIndex + 1} de{' '}
-                  {table.getPageCount()}
-                </span>
-                <button onClick={() => table.nextPage()}>&gt;</button>
-                <button
-                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              <div className='footer__pagination'>
+                <p
+                // style={{
+                //   textAlign: 'center',
+                //   marginTop: '2rem',
+                //   color: '#717171',
+                // }}
                 >
-                  &gt;&gt;
-                </button>
+                  Solupatch © Todos los derechos reservados
+                </p>
+                <div className='cotizaciones__paginationButtons'>
+                  <button onClick={() => table.setPageIndex(0)}>
+                    &lt;&lt;
+                  </button>
+                  <button onClick={() => table.previousPage()}>&lt;</button>
+                  <span style={{ marginLeft: '9px' }}>
+                    {'  '} {table.getState().pagination.pageIndex + 1} de{' '}
+                    {table.getPageCount()}
+                  </span>
+                  <button onClick={() => table.nextPage()}>&gt;</button>
+                  <button
+                    onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  >
+                    &gt;&gt;
+                  </button>
+                </div>
               </div>
-              <p
-                style={{
-                  textAlign: 'center',
-                  marginTop: '2rem',
-                  color: '#717171',
-                }}
-              >
-                Solupatch © Todos los derechos reservados
-              </p>
             </>
           ) : (
             <div className='pdf__loader__spinner'>
@@ -788,438 +774,3 @@ export const Cotizaciones = () => {
     </div>
   );
 };
-
-// NOTE:: OLD TABLE
-
-// <Table striped>
-//   <thead>
-//     <tr>
-//       <th>Folio</th>
-//       <th>Cliente</th>
-//       <th>Fecha</th>
-//       <th>Vendedor</th>
-//       {/* <th>Mercancia</th> */}
-//       {/* <th>Cantidad</th> */}
-//       <th>Total de Cotizacion</th>
-//       <th>Estado</th>
-//       <th></th>
-//       <th></th>
-//       <th></th>
-//       <th></th>
-//     </tr>
-//   </thead>
-//   <tbody>
-//     {cotizaciones.length > 0 ? (
-//       // if the email logged is rvl@solupatch.com render this
-//       emailValue === 'rvl@solupatch.com' ? (
-//         cotizaciones
-//           .map((cotizacion) => {
-//             const { seconds, nanoseconds } =
-//               cotizacion.createdAt || {};
-//             const Date = moment
-//               .unix(seconds)
-//               .add(nanoseconds / 1000000, 'milliseconds');
-//             moment.locale('es');
-//             const Fordate = Date.format('DD/MM/YYYY') || '';
-//             const {
-//               nombre,
-//               id,
-//               emailValue,
-//               entrega,
-//               folio,
-//               status,
-//               cantidad,
-//               precio,
-//               total,
-//               // seleccione,
-//               // empresa,
-//               // celular,
-//               // email,
-//             } = cotizacion;
-//             // console.log("</> → userID:", userID);
-//             let importe =
-//               cantidad * 1 * (precio.replace(/,/g, '') * 1);
-//             let iva =
-//               (importe + entrega.replace(/,/g, '') * 1) * 0.16;
-//             let totalImporte =
-//               importe + iva + entrega.replace(/,/g, '') * 1;
-//             let totalFormated = totalImporte.toLocaleString(
-//               'en-US',
-//               {
-//                 minimumFractionDigits: 2,
-//                 maximumFractionDigits: 2,
-//               }
-//             );
-//             let importeDy = total;
-//             let ivaDy =
-//               (importeDy + entrega.replace(/,/g, '') * 1) * 0.16;
-//             let totalImporteDy =
-//               importeDy + ivaDy + entrega.replace(/,/g, '') * 1;
-//             let totalFormatedDy = totalImporteDy.toLocaleString(
-//               'en-US',
-//               {
-//                 minimumFractionDigits: 2,
-//                 maximumFractionDigits: 2,
-//               }
-//             );
-//             return (
-//               // Table Data
-//               <tr key={id}>
-//                 <td>{folio}</td>
-//                 <td>{nombre}</td>
-//                 <td>{Fordate}</td>
-//                 <td>
-//                   {emailValue === 'aclarrea@solupatch.com'
-//                     ? 'Ana Larrea'
-//                     : emailValue === 'jlramos@solupatch.com'
-//                     ? 'José Ramos'
-//                     : emailValue === 'rvl@solupatch.com'
-//                     ? 'Rodolfo Villalobos'
-//                     : emailValue === 'lblanco@solupatch.com'
-//                     ? 'Luis Blanco'
-//                     : 'Invitado'}
-//                 </td>
-//                 <td>
-//                   ${' '}
-//                   {cotizacion.dynamicForm
-//                     ? totalFormatedDy
-//                     : totalFormated}
-//                 </td>
-//                 <td>
-//                   <span
-//                     style={{
-//                       display: 'flex',
-//                       position: 'relative',
-//                     }}
-//                   >
-//                     <Dropdown onClick={() => onClickUpdate(id)}>
-//                       <Dropdown.Toggle
-//                         variant='warning'
-//                         id='dropdown-basic'
-//                         style={{
-//                           backgroundColor: 'transparent',
-//                           border: '1px solid black',
-//                           borderRadius: '50px',
-//                           padding: '1px 6px 1px 0px',
-//                         }}
-//                       >
-//                         {status === 'cancelado' ? (
-//                           <FaCircleXmark
-//                             style={{
-//                               fontSize: '1.5rem',
-//                               color: 'black',
-//                               backgroundColor: 'red',
-//                               borderRadius: '50px',
-//                               marginLeft: '6px',
-//                             }}
-//                           />
-//                         ) : status === 'vendido' ? (
-//                           <FaCircleCheck
-//                             style={{
-//                               fontSize: '1.5rem',
-//                               color: 'black',
-//                               backgroundColor: 'green',
-//                               borderRadius: '50px',
-//                               marginLeft: '6px',
-//                             }}
-//                           />
-//                         ) : (
-//                           <FaCircleMinus
-//                             style={{
-//                               fontSize: '1.5rem',
-//                               color: 'black',
-//                               backgroundColor: '#FBC512',
-//                               borderRadius: '50px',
-//                               marginLeft: '6px',
-//                             }}
-//                           />
-//                         )}
-//                       </Dropdown.Toggle>
-//                       <Dropdown.Menu>
-//                         <Dropdown.Item
-//                           onClick={(e) =>
-//                             onUpdate(e, 'seguimiento')
-//                           }
-//                           value='seguimiento'
-//                         >
-//                           Seguimiento
-//                         </Dropdown.Item>
-//                         <Dropdown.Item
-//                           onClick={(e) => onUpdate(e, 'cancelado')}
-//                           value='cancelado'
-//                         >
-//                           Cancelado
-//                         </Dropdown.Item>
-//                         <Dropdown.Item
-//                           onClick={(e) => onUpdate(e, 'vendido')}
-//                           value='vendido'
-//                         >
-//                           Vendido
-//                         </Dropdown.Item>
-//                       </Dropdown.Menu>
-//                     </Dropdown>
-//                     {showSaveBtn && id === tempUpdateId && (
-//                       <MdSave
-//                         onClick={onUpdateSave}
-//                         style={{
-//                           width: '25px',
-//                           height: '25px',
-//                           color: 'white',
-//                           backgroundColor: 'black',
-//                           borderRadius: '50px',
-//                           padding: '3px',
-//                           cursor: 'pointer',
-//                           marginLeft: '5px',
-//                           fontSize: '20px',
-//                           position: 'absolute',
-//                           right: '15px',
-//                           top: '1.5px',
-//                         }}
-//                       />
-//                     )}
-//                   </span>
-//                 </td>
-//                 <td></td>
-//                 <td>
-//                   <NavLink
-//                     to={`/pdf/${cotizacion?.id}`}
-//                     target='_blank'
-//                   >
-//                     <button className='cotizador__button--descargar'>
-//                       <FaFilePdf />
-//                     </button>
-//                   </NavLink>
-//                 </td>
-//                 <td>
-//                   <NavLink
-//                     to={`/cotizador-actualizar/${cotizacion?.id}`}
-//                   >
-//                     <button className='cotizador__button--edit'>
-//                       <FaRegPenToSquare />
-//                     </button>
-//                   </NavLink>
-//                 </td>
-//                 <td>
-//                   {/* Boton para dialogo */}
-//                   <Button
-//                     onClick={() => openModal(id)}
-//                     className='cotizador__button--delete'
-//                   >
-//                     <FaTrash />
-//                   </Button>
-//                 </td>
-//               </tr>
-//             );
-//           })
-//           .reverse()
-//       ) : (
-//         // if other email render this
-//         cotizaciones
-//           .filter(
-//             (cotizacion) => cotizacion?.emailValue === emailValue
-//           )
-//           .map((cotizacion) => {
-//             const { seconds, nanoseconds } =
-//               cotizacion.createdAt || {};
-//             const Date = moment
-//               .unix(seconds)
-//               .add(nanoseconds / 1000000, 'milliseconds');
-//             moment.locale('es');
-//             const Fordate = Date.format('DD/MM/YYYY') || '';
-//             const {
-//               nombre,
-//               id,
-//               emailValue,
-//               entrega,
-//               folio,
-//               status,
-//               cantidad,
-//               precio,
-//               total,
-//               // seleccione,
-//               // empresa,
-//               // celular,
-//               // email,
-//             } = cotizacion;
-//             // console.log("</> → userID:", userID);
-//             let importe =
-//               cantidad * 1 * (precio.replace(/,/g, '') * 1);
-//             let iva =
-//               (importe + entrega.replace(/,/g, '') * 1) * 0.16;
-//             let totalImporte =
-//               importe + iva + entrega.replace(/,/g, '') * 1;
-//             let totalFormated = totalImporte.toLocaleString(
-//               'en-US',
-//               {
-//                 minimumFractionDigits: 2,
-//                 maximumFractionDigits: 2,
-//               }
-//             );
-//             let importeDy = total;
-//             let ivaDy =
-//               (importeDy + entrega.replace(/,/g, '') * 1) * 0.16;
-//             let totalImporteDy =
-//               importeDy + ivaDy + entrega.replace(/,/g, '') * 1;
-//             let totalFormatedDy = totalImporteDy.toLocaleString(
-//               'en-US',
-//               {
-//                 minimumFractionDigits: 2,
-//                 maximumFractionDigits: 2,
-//               }
-//             );
-//             return (
-//               // Table Data
-//               <tr key={id}>
-//                 <td>{folio}</td>
-//                 <td>{nombre}</td>
-//                 <td>{Fordate}</td>
-//                 <td>
-//                   {emailValue === 'aclarrea@solupatch.com'
-//                     ? 'Ana Larrea'
-//                     : emailValue === 'jlramos@solupatch.com'
-//                     ? 'José Ramos'
-//                     : emailValue === 'rvl@solupatch.com'
-//                     ? 'Rodolfo Villalobos'
-//                     : emailValue === 'lblanco@solupatch.com'
-//                     ? 'Luis Blanco'
-//                     : 'Invitado'}
-//                 </td>
-//                 <td>
-//                   ${' '}
-//                   {cotizacion.dynamicForm
-//                     ? totalFormatedDy
-//                     : totalFormated}
-//                 </td>
-//                 <td>
-//                   <span
-//                     style={{
-//                       display: 'flex',
-//                       position: 'relative',
-//                     }}
-//                   >
-//                     <Dropdown onClick={() => onClickUpdate(id)}>
-//                       <Dropdown.Toggle
-//                         variant='warning'
-//                         id='dropdown-basic'
-//                         style={{
-//                           backgroundColor: 'transparent',
-//                           border: '1px solid black',
-//                           borderRadius: '50px',
-//                           padding: '1px 6px 1px 0px',
-//                         }}
-//                       >
-//                         {status === 'cancelado' ? (
-//                           <FaCircleXmark
-//                             style={{
-//                               fontSize: '1.5rem',
-//                               color: 'black',
-//                               backgroundColor: 'red',
-//                               borderRadius: '50px',
-//                               marginLeft: '6px',
-//                             }}
-//                           />
-//                         ) : status === 'vendido' ? (
-//                           <FaCircleCheck
-//                             style={{
-//                               fontSize: '1.5rem',
-//                               color: 'black',
-//                               backgroundColor: 'green',
-//                               borderRadius: '50px',
-//                               marginLeft: '6px',
-//                             }}
-//                           />
-//                         ) : (
-//                           <FaCircleMinus
-//                             style={{
-//                               fontSize: '1.5rem',
-//                               color: 'black',
-//                               backgroundColor: '#FBC512',
-//                               borderRadius: '50px',
-//                               marginLeft: '6px',
-//                             }}
-//                           />
-//                         )}
-//                       </Dropdown.Toggle>
-//                       <Dropdown.Menu>
-//                         <Dropdown.Item
-//                           onClick={(e) =>
-//                             onUpdate(e, 'seguimiento')
-//                           }
-//                           value='seguimiento'
-//                         >
-//                           Seguimiento
-//                         </Dropdown.Item>
-//                         <Dropdown.Item
-//                           onClick={(e) => onUpdate(e, 'cancelado')}
-//                           value='cancelado'
-//                         >
-//                           Cancelado
-//                         </Dropdown.Item>
-//                         <Dropdown.Item
-//                           onClick={(e) => onUpdate(e, 'vendido')}
-//                           value='vendido'
-//                         >
-//                           Vendido
-//                         </Dropdown.Item>
-//                       </Dropdown.Menu>
-//                     </Dropdown>
-//                     {showSaveBtn && id === tempUpdateId && (
-//                       <MdSave
-//                         onClick={onUpdateSave}
-//                         style={{
-//                           width: '25px',
-//                           height: '25px',
-//                           color: 'white',
-//                           backgroundColor: 'black',
-//                           borderRadius: '50px',
-//                           padding: '3px',
-//                           cursor: 'pointer',
-//                           marginLeft: '5px',
-//                           fontSize: '20px',
-//                           position: 'absolute',
-//                           right: '15px',
-//                           top: '1.5px',
-//                         }}
-//                       />
-//                     )}
-//                   </span>
-//                 </td>
-//                 <td></td>
-//                 <td>
-//                   <NavLink
-//                     to={`/pdf/${cotizacion?.id}`}
-//                     target='_blank'
-//                   >
-//                     <button className='cotizador__button--descargar'>
-//                       <FaFilePdf />
-//                     </button>
-//                   </NavLink>
-//                 </td>
-//                 <td>
-//                   <NavLink
-//                     to={`/cotizador-actualizar/${cotizacion?.id}`}
-//                   >
-//                     <button className='cotizador__button--edit'>
-//                       <FaRegPenToSquare />
-//                     </button>
-//                   </NavLink>
-//                 </td>
-//                 <td>
-//                   {/* Boton para dialogo */}
-//                   <Button
-//                     onClick={() => openModal(id)}
-//                     className='cotizador__button--delete'
-//                   >
-//                     <FaTrash />
-//                   </Button>
-//                 </td>
-//               </tr>
-//             );
-//           })
-//           .reverse()
-//       )
-//     ) : (
-//       <div>No hay cotizaciones</div>
-//     )}
-//   </tbody>
-// </Table>

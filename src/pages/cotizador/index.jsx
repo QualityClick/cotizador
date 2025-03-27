@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from 'react';
-import { signOut } from 'firebase/auth';
-import { auth } from '../../firebase/firebase-config';
+import { useEffect, useState, useRef } from 'react';
+// import { signOut } from 'firebase/auth';
+// import { auth } from '../../firebase/firebase-config';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAddFolio } from '../../hooks/useAddFolio';
@@ -10,11 +10,14 @@ import { useAddCotizacion } from '../../hooks/useAddCotizacion';
 import { useGetUserInfo } from '../../hooks/useGetUserInfo';
 import { useGetFolio } from '../../hooks/useGetFolio';
 
-import logoPrincipal from '../../assets/imgs/logoSolupatch.png';
-import { FaClipboardList, FaWhatsapp } from 'react-icons/fa6';
-import { RxAvatar } from 'react-icons/rx';
-import './styles.scss';
+// import logoPrincipal from '../../assets/imgs/logoSolupatch.png';
+// import { FaClipboardList, FaWhatsapp } from 'react-icons/fa6';
+// import { RxAvatar } from 'react-icons/rx';
 import { AddDynamicInputs } from '../../components/addDynamicInputs';
+// import Overlay from 'react-bootstrap/Overlay';
+// import Tooltip from 'react-bootstrap/Tooltip';
+import './styles.scss';
+import { NavBar } from '../../components/navBar';
 
 export const Cotizador = () => {
   // const [tipo, setTipo] = useState("");
@@ -23,6 +26,8 @@ export const Cotizador = () => {
   const [dataFromDynamicInputs, setDataFromDynamicInputs] = useState('');
   const [conceptoGuardado, setConceptoGuardado] = useState(false);
   const [sumImportes, setSumImportes] = useState('');
+  const [show, setShow] = useState(false);
+  const target = useRef(null);
 
   const { addFolio } = useAddFolio();
   const { addCotizacion } = useAddCotizacion();
@@ -85,7 +90,7 @@ export const Cotizador = () => {
   const onSubmit = async (data, e) => {
     e.preventDefault();
     if (folios?.length <= 9) {
-      console.log(sumImportes);
+      // console.log(sumImportes);
       const dataObj = {
         folio: '00000' + folios.length,
         status: 'seguimineto',
@@ -95,7 +100,7 @@ export const Cotizador = () => {
       };
       addCotizacion(dataObj);
     } else if (folios?.length <= 99) {
-      console.log(sumImportes);
+      // console.log(sumImportes);
       const dataObj = {
         folio: '0000' + folios.length,
         status: 'seguimineto',
@@ -105,7 +110,7 @@ export const Cotizador = () => {
       };
       addCotizacion(dataObj);
     } else if (folios?.length <= 999) {
-      console.log(sumImportes);
+      // console.log(sumImportes);
       const dataObj = {
         folio: '000' + folios.length,
         status: 'seguimineto',
@@ -115,7 +120,7 @@ export const Cotizador = () => {
       };
       addCotizacion(dataObj);
     } else if (folios?.length <= 9999) {
-      console.log(sumImportes);
+      // console.log(sumImportes);
       const dataObj = {
         folio: '00' + folios.length,
         status: 'seguimineto',
@@ -125,7 +130,7 @@ export const Cotizador = () => {
       };
       addCotizacion(dataObj);
     } else if (folios?.length <= 99999) {
-      console.log(sumImportes);
+      // console.log(sumImportes);
       const dataObj = {
         folio: '0' + folios.length,
         status: 'seguimineto',
@@ -135,7 +140,7 @@ export const Cotizador = () => {
       };
       addCotizacion(dataObj);
     } else {
-      console.log(sumImportes);
+      // console.log(sumImportes);
       const dataObj = {
         folio: folios.length,
         status: 'seguimineto',
@@ -146,16 +151,6 @@ export const Cotizador = () => {
       addCotizacion(dataObj);
     }
     addFolio(folio);
-  };
-
-  const logout = async () => {
-    try {
-      await signOut(auth);
-      localStorage.clear();
-      navigate('/autenticacion');
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   useEffect(() => {
@@ -169,78 +164,9 @@ export const Cotizador = () => {
     return <Navigate to='/' />;
   }
 
-  // console.log(emailValue);
-
   return (
     <div className='cotizador'>
-      <div className='cotizaciones__navbar'>
-        <a href='https://solupatch.com' target='_blank'>
-          <img
-            src={logoPrincipal}
-            alt='Logo Solupatch'
-            className='cotizaciones__navbar--img'
-          />
-        </a>
-        <div className='navbar__buttons'>
-          <a href='/cotizaciones'>
-            <button className='navbar__button--cotizaciones'>
-              <FaClipboardList
-                style={{
-                  fontSize: '1rem',
-                  marginTop: '-5px',
-                  marginRight: '-3px',
-                }}
-              />{' '}
-              Cotizaciones
-            </button>
-          </a>
-          <a href='https://wa.link/vmn1ao' target='_blank'>
-            <button className='navbar__button--cotizaciones'>
-              <FaWhatsapp /> Soporte
-            </button>
-          </a>
-          <div
-            onClick={logout}
-            className='navbar__button--cotizaciones-vendedor-container'
-          >
-            <button
-              className='navbar__button--cotizaciones-vendedor'
-              // onClick={logout}
-            >
-              <div style={{ display: 'flex' }}>
-                <div>
-                  <div style={{ fontWeight: '900' }}>
-                    {emailValue === 'rvl@solupatch.com'
-                      ? 'Rodolfo Villalobos'
-                      : emailValue === 'aclarrea@solupatch.com'
-                      ? 'Ana Larrea'
-                      : emailValue === 'jlramos@solupatch.com'
-                      ? 'José Ramos'
-                      : emailValue === 'lblanco@solupatch.com'
-                      ? 'Luis Blanco'
-                      : 'Invitado'}
-                  </div>
-                  <div style={{ fontWeight: '100' }}>{emailValue}</div>
-                </div>
-                <div>
-                  <RxAvatar
-                    style={{
-                      fontSize: '1.5rem',
-                      marginTop: '5px',
-                      marginLeft: '10px',
-                    }}
-                  />
-                </div>
-              </div>
-            </button>
-            <div className='navbar__button--cotizaciones-vendedor-overlay'>
-              {/* <div className='navbar__button--cotizaciones-vendedor-text'>
-                Cerrar Sesión
-              </div> */}
-            </div>
-          </div>
-        </div>
-      </div>
+      <NavBar />
       <div className='cotizador__body'>
         <div className='cotizador__hero'>
           <h2 className='cotizador__header--title'>CREAR COTIZACIÓN</h2>
@@ -317,10 +243,6 @@ export const Cotizador = () => {
               )} */}
             </div>
           </div>
-          <AddDynamicInputs
-            getDataFromChild={handleDataFromChild}
-            stateChanger={setConceptoGuardado}
-          />
           <div className='cotizador__form--inputs2'>
             <div className='cotizador__input--pair'>
               <label className='cotizador__inputs--label'>
@@ -364,6 +286,10 @@ export const Cotizador = () => {
               )}
             </div>
           </div>
+          <AddDynamicInputs
+            getDataFromChild={handleDataFromChild}
+            stateChanger={setConceptoGuardado}
+          />
           <button
             disabled={!isDirty || isSubmitting || !conceptoGuardado}
             type='submit'

@@ -106,6 +106,7 @@ export const AddDynamicInputs = ({ getDataFromChild, stateChanger }) => {
               <div
                 className='input_container cotizador__form--inputs'
                 key={index}
+                style={{ gap: '0 1rem' }}
               >
                 {/* NOTE: Seleccione */}
                 <div className='cotizador__input--pair cotizador__input--pair--select'>
@@ -119,6 +120,9 @@ export const AddDynamicInputs = ({ getDataFromChild, stateChanger }) => {
                     className='cotizador__inputs--select'
                     // onChange={() => fnchange()}
                   >
+                    <option value='' disabled>
+                      Elige una opcion
+                    </option>
                     <option value='25kg Solupatch Bultos'>
                       25kgs Solupatch Bultos
                     </option>
@@ -142,6 +146,7 @@ export const AddDynamicInputs = ({ getDataFromChild, stateChanger }) => {
                       Emulsión aslfáltica
                     </option>
                     <option value='Slurry Seal'>Slurry Seal</option>
+                    <option value='Bacherey'>Bacherey</option>
                   </select>
                   {errors?.seleccione?.type === 'required' && (
                     <p className='cotizador__form--error-message'>
@@ -287,7 +292,7 @@ export const AddDynamicInputs = ({ getDataFromChild, stateChanger }) => {
         onClick={handleSubmit(onSaveConcept)}
         className='cotizador__form--guardar-button'
       >
-        Guardar Conceptos
+        GUARDAR CONCEPTOS
       </button>
       <Toaster position='bottom-center' richColors />
     </div>

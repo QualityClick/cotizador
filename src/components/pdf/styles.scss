@@ -60,7 +60,7 @@
       // font-weight: 900;
     }
     .pdf__header__datos1 {
-      font-weight: 900;
+      font-family: 'GalanoGrotesqueBold';
     }
     :nth-child(2) {
       font-size: 1rem;
@@ -143,6 +143,7 @@
         padding-block: 15px;
         text-align: center;
         width: 100px;
+        font-family: 'GalanoGrotesqueBold';
       }
       .cotizacion__title__th-concepto {
         font-size: 1.1rem;
@@ -192,8 +193,9 @@
     justify-content: flex-end;
     font-weight: 900;
     font-size: 1rem;
-    // .cotizacion__total__span {
-    // }
+    .cotizacion__total__span {
+      font-family: 'GalanoGrotesqueBold';
+    }
   }
   .certificaciones__img {
     width: 250px;
@@ -233,10 +235,10 @@
 
 .observaciones__text {
   margin-top: -35px;
-  margin-bottom: 120px;
+  margin-bottom: 60px;
   h5 {
     font-size: 1.2rem;
-    font-weight: 900;
+    font-family: 'GalanoGrotesqueBold';
   }
   .observaciones__ul {
     margin-left: -15px;
@@ -251,22 +253,22 @@
 .footer {
   margin-top: 0px;
   width: 120%;
-  background-color: #fbc512;
+  background-color: #15153B;
   margin-left: -90px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: end;
   .footer__social {
     display: flex;
     color: #fff;
     padding-block: 30px;
     font-weight: 700;
-    padding-left: 73px;
+    padding: 2rem;
     gap: 5px;
     a {
       width: 40px;
-      background-color: #000;
-      color: #fff;
+      background-color: #fbc512;
+      color: #000;
       font-size: 1.4rem;
       aspect-ratio: 1 / 1;
       border-radius: 50%;
@@ -281,9 +283,11 @@
     }
   }
   .footer__web {
-    img {
-      width: 350px;
-      margin-right: 30px;
+    a {
+      font-family: 'GalanoGrotesqueBold';
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.5rem;
     }
   }
 }
